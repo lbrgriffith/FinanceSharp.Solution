@@ -1,6 +1,7 @@
 ﻿namespace FinanceSharp;
 
 using CommandLine;
+using ConsoleTables;
 using Options;
 using Sharprompt;
 
@@ -14,24 +15,26 @@ internal class Program
               {
                   decimal principle  = 0M;
                   decimal rate       = 0M;
-                  decimal time = 0M;
+                  decimal time       = 0M;
+
+                  #region Simple Interest Validations
 
                   if (opts.Principal is not null)
                   {
-                        principle = (decimal)opts.Principal;
+                      principle = (decimal)opts.Principal;
                   }
                   else
                   {
-                      principle = Prompt.Input<decimal>("What's the priciple?", 
-                                                        defaultValue: 0M, 
-                                                        placeholder: "Enter an amount greater than zero", 
-                                                        validators: new[] { Validators.Required(), 
-                                                                            Validators.MinLength(1, "Amount is required!") 
+                      principle = Prompt.Input<decimal>("What's the priciple?",
+                                                        defaultValue: 0M,
+                                                        placeholder: "Enter an amount greater than zero",
+                                                        validators: new[] { Validators.Required(),
+                                                                            Validators.MinLength(1, "Amount is required!")
                                                         });
                   }
 
                   if (opts.Rate is not null)
-                  {                             
+                  {
                       rate = (decimal)opts.Rate;
                   }
                   else
@@ -40,7 +43,7 @@ internal class Program
                                                    defaultValue: 0M,
                                                    placeholder: "Enter a percentage greater than zero",
                                                    validators: new[] { Validators.Required(),
-                                                   Validators.MinLength(1, "Amount is required!")
+                                                                       Validators.MinLength(1, "Amount is required!")
                                                   });
                   }
 
@@ -51,16 +54,24 @@ internal class Program
                   else
                   {
                       time = Prompt.Input<decimal>("What's the time in years?",
-                                                                                   defaultValue: 0M,
-                                                                                                                                            placeholder: "Enter a percentage greater than zero",
-                                                                                                                                                                                                     validators: new[] { Validators.Required(),
-                                                                                                                                                                                                                                                              Validators.MinLength(1, "Amount is required!")
-                                                                                                                                                                                                                                                              });
-                  }
+                                                   defaultValue: 0M,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                   });
+                  } 
+
+                  #endregion
+
                   decimal interest = CalculateSimpleInterest(principle,
-                                                                 rate,
-                                                                 time);
-                      Console.WriteLine($"Simple interest: {interest}");
+                                                             rate,
+                                                             time);
+
+                  var table = new ConsoleTable("Description", "Result");
+                  table.AddRow("Simple interest", interest);
+
+                  table.Write();
+                  Console.WriteLine();
                   return interest;
               },
               errs => 1);
