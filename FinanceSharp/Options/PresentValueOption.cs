@@ -3,7 +3,7 @@
 namespace FinanceSharp.Options;
 
 [Verb("present-value", HelpText = "Calculates present value.")]
-internal class PresentValue
+internal class PresentValueOption
 {
     [Option('f', "future-value", Required = false, HelpText = "The future value.")]
     public decimal? FutureValue { get; set; }
