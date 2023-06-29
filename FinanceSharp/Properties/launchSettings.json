@@ -2,7 +2,7 @@
   "profiles": {
     "FinanceSharp": {
       "commandName": "Project",
-      "commandLineArgs": "-t 5 -r 6.5 -p 1000"
+      "commandLineArgs": "simple-interest -t 5 -r 6.5 -p 1000"
     }
   }
 }
