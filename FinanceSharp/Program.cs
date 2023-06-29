@@ -9,7 +9,9 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        Parser.Default.ParseArguments<SimpleInterestOption, CompoundInterest>(args)
+        Parser.Default.ParseArguments<SimpleInterestOption, 
+                                      CompoundInterest,
+                                      PresentValueOption>(args)
             .MapResult(
               (SimpleInterestOption opts) =>
               {
@@ -137,6 +139,72 @@ internal class Program
                   Console.WriteLine();
                   return interest;
               },
+              (PresentValueOption pv) =>
+              {
+                  decimal principle = 0M;
+                  decimal rate      = 0M;
+                  int time          = 1;
+
+                  #region Simple Interest Validations
+
+                  if (pv.FutureValue is not null)
+                  {
+                      principle = (decimal)pv.FutureValue;
+                  }
+                  else
+                  {
+                      principle = Prompt.Input<decimal>("What's the future amount?",
+                                                        defaultValue: 0M,
+                                                        placeholder: "Enter an amount greater than zero",
+                                                        validators: new[] { Validators.Required(),
+                                                                            Validators.MinLength(1, "Amount is required!")
+                                                        });
+                  }
+
+                  if (pv.Rate is not null)
+                  {
+                      rate = (decimal)pv.Rate;
+                  }
+                  else
+                  {
+                      rate = Prompt.Input<decimal>("What's the interest rate?",
+                                                   defaultValue: 0M,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                  });
+                  }
+
+                  if (pv.Time is not null)
+                  {
+                      time = (int)pv.Time;
+                  }
+                  else
+                  {
+                      time = Prompt.Input<int>("What's the time in years?",
+                                                   defaultValue: 0,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                   });
+                  }
+
+                  #endregion
+
+                  decimal result = CalculatePresentValue(principle,
+                                                             rate,
+                                                             time);
+
+                  var table = new ConsoleTable("Description", "Value");
+                  table.AddRow("Future Value", principle);
+                  table.AddRow("Interest Rate", rate);
+                  table.AddRow("Time", time);
+                  table.AddRow("Present Value", result);
+
+                  table.Write();
+                  Console.WriteLine();
+                  return result;
+              },
               errs => 1);
     }
 
@@ -174,6 +242,28 @@ internal class Program
         // Return the resulting amount.
         return resultingAmount;
     } 
+
+     /// <summary>
+    /// Calculates the present value based on the future value, interest rate, and time period.
+    /// </summary>
+    /// <param name="futureValue">The future value to be discounted.</param>
+    /// <param name="interestRate">The interest rate per period.</param>
+    /// <param name="timePeriod">The number of periods.</param>
+    /// <returns>The present value.</returns>
+    static decimal CalculatePresentValue(decimal futureValue, decimal interestRate, int timePeriod)
+    {
+        // Ensure the future value, interest rate, and time period are valid.
+        if (futureValue < 0 || interestRate < 0 || timePeriod < 0)
+        {
+            throw new ArgumentException("Future value, interest rate, and time period must be non-negative.");
+        }
+
+        // Calculate the present value.
+        decimal presentValue = futureValue / (decimal)Math.Pow((double)(1 + (interestRate / 100)), timePeriod);
+
+        // Return the present value.
+        return presentValue;
+    }
 
     #endregion
 }
