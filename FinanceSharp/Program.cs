@@ -148,14 +148,15 @@ internal class Program
         return (principal * rate * time) / 100;
     }
 
-    // Calculates compound interest based on the principal amount, interest rate, and time period
-    // and returns the resulting amount.
-    // Parameters:
-    //   principalAmount: The initial amount of money.
-    //   interestRate: The annual interest rate.
-    //   timePeriod: The time period in years.
-    // Returns:
-    //   The resulting amount after applying compound interest.
+    /// <summary>
+    /// Calculates compound interest based on the principal amount, interest rate, and time period
+    /// and returns the resulting amount.
+    /// </summary>
+    /// <param name="principalAmount">The initial amount of money.</param>
+    /// <param name="interestRate">The annual interest rate.</param>
+    /// <param name="timePeriod">The time period in years.</param>
+    /// <returns>The resulting amount after applying compound interest.</returns>
+    /// <exception cref="ArgumentException">Missing arguments required to complete the calculations.</exception>
     static public decimal CalculateCompoundInterest(decimal principalAmount, decimal interestRate, int timePeriod)
     {
         // Ensure the principal amount, interest rate, and time period are non-negative.
