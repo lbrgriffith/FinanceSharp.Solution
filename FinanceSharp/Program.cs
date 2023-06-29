@@ -2,6 +2,7 @@
 
 using CommandLine;
 using Options;
+using Sharprompt;
 
 internal class Program
 {
@@ -11,9 +12,54 @@ internal class Program
             .MapResult(
               (SimpleInterestOption opts) =>
               {
-                      decimal interest = CalculateSimpleInterest(opts.Principal, 
-                                                                 opts.Rate, 
-                                                                 opts.Time);
+                  decimal principle  = 0M;
+                  decimal rate       = 0M;
+                  decimal time = 0M;
+
+                  if (opts.Principal is not null)
+                  {
+                        principle = (decimal)opts.Principal;
+                  }
+                  else
+                  {
+                      principle = Prompt.Input<decimal>("What's the priciple?", 
+                                                        defaultValue: 0M, 
+                                                        placeholder: "Enter an amount greater than zero", 
+                                                        validators: new[] { Validators.Required(), 
+                                                                            Validators.MinLength(1, "Amount is required!") 
+                                                        });
+                  }
+
+                  if (opts.Rate is not null)
+                  {                             
+                      rate = (decimal)opts.Rate;
+                  }
+                  else
+                  {
+                      rate = Prompt.Input<decimal>("What's the interest rate?",
+                                                   defaultValue: 0M,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                   Validators.MinLength(1, "Amount is required!")
+                                                  });
+                  }
+
+                  if (opts.Time is not null)
+                  {
+                      time = (decimal)opts.Time;
+                  }
+                  else
+                  {
+                      time = Prompt.Input<decimal>("What's the time in years?",
+                                                                                   defaultValue: 0M,
+                                                                                                                                            placeholder: "Enter a percentage greater than zero",
+                                                                                                                                                                                                     validators: new[] { Validators.Required(),
+                                                                                                                                                                                                                                                              Validators.MinLength(1, "Amount is required!")
+                                                                                                                                                                                                                                                              });
+                  }
+                  decimal interest = CalculateSimpleInterest(principle,
+                                                                 rate,
+                                                                 time);
                       Console.WriteLine($"Simple interest: {interest}");
                   return interest;
               },
