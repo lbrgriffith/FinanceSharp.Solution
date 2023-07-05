@@ -4,6 +4,7 @@ using CommandLine;
 using ConsoleTables;
 using Options;
 using Sharprompt;
+using System.Globalization;
 
 internal class Program
 {
@@ -11,7 +12,8 @@ internal class Program
     {
         Parser.Default.ParseArguments<SimpleInterestOption, 
                                       CompoundInterest,
-                                      PresentValueOption>(args)
+                                      PresentValueOption,
+                                      FutureValue>(args)
             .MapResult(
               (SimpleInterestOption opts) =>
               {
@@ -205,10 +207,99 @@ internal class Program
                   Console.WriteLine();
                   return result;
               },
+              (FutureValue fv) =>
+              {
+                  decimal principle = 0M;
+                  decimal rate      = 0M;
+                  decimal frequency = 0M;
+                  int time          = 1;
+
+                  #region Validations
+
+                  if (fv.Principal is not null)
+                  {
+                      principle = (decimal)fv.Principal;
+                  }
+                  else
+                  {
+                      principle = Prompt.Input<int>("What's the time in years?",
+                                                   defaultValue: 0,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                   });
+                  }
+
+                  if (fv.Frequency is not null)
+                  {
+                      frequency = (decimal)fv.Frequency;
+                  }
+                  else
+                  {
+                      frequency = Prompt.Input<decimal>("What's the Compounding Frequency?",
+                                                        defaultValue: 0M,
+                                                        placeholder: "Enter an amount greater than zero",
+                                                        validators: new[] { Validators.Required(),
+                                                                            Validators.MinLength(1, "Amount is required!")
+                                                        });
+                  }
+
+                  if (fv.Rate is not null)
+                  {
+                      rate = (decimal)fv.Rate;
+                  }
+                  else
+                  {
+                      rate = Prompt.Input<decimal>("What's the interest rate?",
+                                                   defaultValue: 0M,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                  });
+                  }
+
+                  if (fv.Time is not null)
+                  {
+                      time = (int)fv.Time;
+                  }
+                  else
+                  {
+                      time = Prompt.Input<int>("What's the time in years?",
+                                                   defaultValue: 0,
+                                                   placeholder: "Enter a percentage greater than zero",
+                                                   validators: new[] { Validators.Required(),
+                                                                       Validators.MinLength(1, "Amount is required!")
+                                                   });
+                  }
+
+                  #endregion
+
+                  decimal result = CalculateFutureValue(principle,
+                                                             rate,
+                                                             frequency,
+                                                             time);
+
+                  var table = new ConsoleTable("Description", "Value");
+                  table.AddRow("Principal", principle);
+                  table.AddRow("Interest Rate", rate);
+                  table.AddRow("Time", time);
+                  table.AddRow("Compounding Frequency", frequency);
+                  table.AddRow("Future Value", result.ToString("C", CultureInfo.CurrentCulture));
+
+                  table.Write();
+                  Console.WriteLine();
+                  return result;
+              },
               errs => 1);
     }
 
     #region Methods
+
+    static decimal CalculateFutureValue(decimal principal, decimal rate, decimal compoundingFrequency, decimal time)
+    {
+        // formula to calculate future value: P*(1 + r/n)^(nt)
+        return principal * (decimal)Math.Pow((double)(1 + rate / (100 * compoundingFrequency)), (double)(compoundingFrequency * time));
+    }
 
     static decimal CalculateSimpleInterest(decimal principal, decimal rate, decimal time)
     {

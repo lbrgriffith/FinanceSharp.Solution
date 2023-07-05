@@ -15,5 +15,5 @@ internal class FutureValue
     public decimal? Time { get; set; }
 
     [Option('f', "frequency", Required = false, HelpText = "The compounding frequency.")]
-    public decimal Frequency { get; set; }
+    public decimal? Frequency { get; set; }
 }
